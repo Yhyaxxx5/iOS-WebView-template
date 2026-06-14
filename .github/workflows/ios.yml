@@ -12,23 +12,27 @@ jobs:
 
       - name: Resolve Swift Packages
         run: |
-          xcodebuild -resolvePackageDependencies -project "Go Guide.xcodeproj" -scheme "Go Guide"
+          xcodebuild -resolvePackageDependencies -project "Go Guide.xcodeproj"
 
-      - name: Build Xcode Project
+      - name: Build Xcode Project (Auto Detect Scheme)
         run: |
           mkdir -p build
+          # العثور على أول scheme متاح وبناء المشروع من خلاله تلقائياً
+          SCHEME=$(xcodebuild -list -project "Go Guide.xcodeproj" | awk '/Schemes:/{flag=1;next} /^$/{flag=0} flag' | sed 's/^[[:space:]]*//' | head -n 1)
+          echo "Detected Scheme: $SCHEME"
+          
           xcodebuild archive \
             -project "Go Guide.xcodeproj" \
-            -scheme "Go Guide" \
+            -scheme "$SCHEME" \
             -sdk iphoneos \
-            -archivePath build/GoGuide.xcarchive \
+            -archivePath build/App.xcarchive \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO
 
       - name: Export App Artifact
         run: |
           mkdir -p build/Artifact
-          cp -r build/GoGuide.xcarchive/Products/Applications/*.app build/Artifact/ || true
+          cp -r build/App.xcarchive/Products/Applications/*.app build/Artifact/ || true
 
       - name: Upload App File
         uses: actions/upload-artifact@v4
