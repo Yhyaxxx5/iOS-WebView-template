@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scheme LastUpgradeVersion="1200" version="1.7">
+   <BuildAction parallelizeBuildables="YES" buildImplicitDependencies="YES">
+      <BuildActionEntries>
+         <BuildActionEntry>
+            <BuildableReference
+               BuildableIdentifier="primary"
+               BlueprintIdentifier="8171D2071F6B096F00AA7B99"
+               BuildableName="Go Guide.app"
+               BlueprintName="Go Guide"
+               ReferencedContainer="container:Go Guide.xcodeproj"/>
+         </BuildActionEntry>
+      </BuildActionEntries>
+   </BuildAction>
+
+   <TestAction enabled="YES"/>
+   <LaunchAction enabled="YES"/>
+   <ProfileAction/>
+   <AnalyzeAction/>
+   <ArchiveAction/>
+</Scheme>
