@@ -10,12 +10,28 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Resolve Swift Packages
+        run: |
+          xcodebuild -resolvePackageDependencies -project "Go Guide.xcodeproj" -scheme "Go Guide"
+
       - name: Build Xcode Project
         run: |
-          xcodebuild build -project "Go Guide.xcodeproj" -scheme "Go Guide" -sdk iphoneos CODE_SIGNING_ALLOWED=NO
+          mkdir -p build
+          xcodebuild archive \
+            -project "Go Guide.xcodeproj" \
+            -scheme "Go Guide" \
+            -sdk iphoneos \
+            -archivePath build/GoGuide.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO
 
-      - name: Upload IPA Artifact
+      - name: Export App Artifact
+        run: |
+          mkdir -p build/Artifact
+          cp -r build/GoGuide.xcarchive/Products/Applications/*.app build/Artifact/ || true
+
+      - name: Upload App File
         uses: actions/upload-artifact@v4
         with:
           name: ios-app-file
-          path: build/**/*.app
+          path: build/Artifact/
