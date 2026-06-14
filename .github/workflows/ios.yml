@@ -1,40 +1,33 @@
-name: Build iOS App
+name: iOS Build
 
 on:
+  push:
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: macos-latest
+
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Resolve Swift Packages
-        run: xcodebuild -resolvePackageDependencies -project "Go Guide.xcodeproj"
+      - name: Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode.app
 
-      - name: Build and Archive Project
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Build iOS App (Archive)
         run: |
           mkdir -p build
           xcodebuild archive \
-            -project "GoGuide.xcodeproj" \
-            -scheme "GoGuide" \
+            -project "Go Guide.xcodeproj" \
+            -scheme "Go Guide" \
             -sdk iphoneos \
-            -archivePath "build/GoGuide.xcarchive" \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO
+            -archivePath build/GoGuide.xcarchive \
+            CODE_SIGNING_ALLOWED=NO
 
-      - name: Export App Folder
-        run: |
-          mkdir -p build/Artifact
-          if [ -d "build/GoGuide.xcarchive/Products/Applications" ]; then
-            cp -r build/GoGuide.xcarchive/Products/Applications/*.app build/Artifact/
-          else
-            find build -name "*.app" -exec cp -r {} build/Artifact/ \;
-          fi
-
-      - name: Upload Finished App
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-app-file
-          path: build/Artifact/
+      - name: List build folder
+        run: ls -R build
