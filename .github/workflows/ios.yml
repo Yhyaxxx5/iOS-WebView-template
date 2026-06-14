@@ -13,16 +13,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Show Xcode version
-        run: xcodebuild -version
-
-      - name: List projects
-        run: ls
-
-      - name: Build app
+      - name: Show project and schemes
         run: |
+          xcodebuild -list -project "Go Guide.xcodeproj"
+
+      - name: Build app (auto detect scheme attempt)
+        run: |
+          echo "Trying common scheme names..."
+
           xcodebuild clean build \
           -project "Go Guide.xcodeproj" \
           -scheme "Go Guide" \
+          -sdk iphoneos \
+          CODE_SIGNING_ALLOWED=NO || \
+          
+          xcodebuild clean build \
+          -project "Go Guide.xcodeproj" \
+          -scheme "GoGuide" \
+          -sdk iphoneos \
+          CODE_SIGNING_ALLOWED=NO || \
+          
+          xcodebuild clean build \
+          -project "Go Guide.xcodeproj" \
+          -scheme "Go_Guide" \
           -sdk iphoneos \
           CODE_SIGNING_ALLOWED=NO
