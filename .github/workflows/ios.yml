@@ -13,21 +13,33 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Select Xcode version
+      - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode.app
 
       - name: Show Xcode version
         run: xcodebuild -version
 
-      - name: Build iOS App (Archive)
+      - name: List project info (debug)
+        run: xcodebuild -list -project "Go Guide.xcodeproj"
+
+      - name: Clean build
         run: |
           mkdir -p build
+          xcodebuild clean \
+            -project "Go Guide.xcodeproj" \
+            -scheme "Go Guide"
+
+      - name: Archive build
+        run: |
           xcodebuild archive \
             -project "Go Guide.xcodeproj" \
             -scheme "Go Guide" \
             -sdk iphoneos \
+            -configuration Release \
             -archivePath build/GoGuide.xcarchive \
-            CODE_SIGNING_ALLOWED=NO
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY=""
 
-      - name: List build folder
+      - name: Show build output
         run: ls -R build
