@@ -11,30 +11,29 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Resolve Swift Packages
-        run: |
-          xcodebuild -resolvePackageDependencies -project "Go Guide.xcodeproj"
+        run: xcodebuild -resolvePackageDependencies -project "Go Guide.xcodeproj"
 
-      - name: Build Xcode Project (Auto Detect Scheme)
+      - name: Build and Archive Project
         run: |
           mkdir -p build
-          # العثور على أول scheme متاح وبناء المشروع من خلاله تلقائياً
-          SCHEME=$(xcodebuild -list -project "Go Guide.xcodeproj" | awk '/Schemes:/{flag=1;next} /^$/{flag=0} flag' | sed 's/^[[:space:]]*//' | head -n 1)
-          echo "Detected Scheme: $SCHEME"
-          
           xcodebuild archive \
             -project "Go Guide.xcodeproj" \
-            -scheme "$SCHEME" \
+            -scheme "Go Guide" \
             -sdk iphoneos \
-            -archivePath build/App.xcarchive \
+            -archivePath "build/GoGuide.xcarchive" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO
 
-      - name: Export App Artifact
+      - name: Export App Folder
         run: |
           mkdir -p build/Artifact
-          cp -r build/App.xcarchive/Products/Applications/*.app build/Artifact/ || true
+          if [ -d "build/GoGuide.xcarchive/Products/Applications" ]; then
+            cp -r build/GoGuide.xcarchive/Products/Applications/*.app build/Artifact/
+          else
+            find build -name "*.app" -exec cp -r {} build/Artifact/ \;
+          fi
 
-      - name: Upload App File
+      - name: Upload Finished App
         uses: actions/upload-artifact@v4
         with:
           name: ios-app-file
